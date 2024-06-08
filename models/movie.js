@@ -15,6 +15,7 @@ const movieSchema = new Schema({
   director: { type: String, required: true },
   cast: { type: Array, required: true },
   image: { type: String },
+  description: { type: String },
   status: {
     type: String,
     default: "Want to watch",

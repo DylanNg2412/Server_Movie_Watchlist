@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const genre = await getGenre();
     res.status(200).send(genre);

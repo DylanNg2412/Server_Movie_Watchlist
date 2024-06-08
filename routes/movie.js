@@ -52,6 +52,7 @@ router.post("/", isAdmin, async (req, res) => {
     const director = req.body.director;
     const cast = req.body.cast;
     const image = req.body.image;
+    const description = req.body.description;
     console.log(genres);
     // const genreArray = Array.isArray(genre) ? genre : [genre];
     const newMovie = await addMovie(
@@ -61,7 +62,8 @@ router.post("/", isAdmin, async (req, res) => {
       release_date,
       director,
       cast,
-      image
+      image,
+      description
     );
     res.status(200).send(newMovie);
   } catch (error) {
@@ -83,6 +85,8 @@ router.put("/:id", isAdmin, async (req, res) => {
     const director = req.body.director;
     const cast = req.body.cast;
     const image = req.body.image;
+    const description = req.body.description;
+    const status = req.body.status;
     // const genreArray = Array.isArray(genre) ? genre : genre.split(",");
 
     const updatedMovie = await updateMovie(
@@ -93,7 +97,9 @@ router.put("/:id", isAdmin, async (req, res) => {
       release_date,
       director,
       cast,
-      image
+      image,
+      description,
+      status
     );
     const movie = await Movie.findById(movie_id);
     res.status(200).send(movie);

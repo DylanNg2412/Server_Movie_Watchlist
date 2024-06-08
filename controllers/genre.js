@@ -7,8 +7,8 @@ const getGenres = async () => {
   return genres;
 };
 
-const getGenre = async (_id, name) => {
-  const genre = await Genre.findById(_id).populate("genres");
+const getGenre = async (_id) => {
+  const genre = await Genre.findById(_id);
   return genre;
 };
 

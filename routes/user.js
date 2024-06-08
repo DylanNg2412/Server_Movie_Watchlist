@@ -7,7 +7,13 @@ const {
   signUpUser,
   getUsers,
   getUser,
+  updateUser,
+  addUser,
 } = require("../controllers/user");
+
+const User = require("../models/user");
+
+const { isAdmin } = require("../middleware/auth");
 
 //login route
 router.post("/login", async (req, res) => {
@@ -45,7 +51,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", isAdmin, async (req, res) => {
   try {
     const user = await getUser(req.params.id);
     if (user) {
@@ -58,4 +64,50 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// add user route
+router.post("/", isAdmin, async (req, res) => {
+  try {
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
+    const role = req.body.role;
+    const newUser = await addUser(name, email, password, role);
+    res.status(200).send(newUser);
+  } catch (error) {
+    re.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+// edit user route
+router.put("/:id", isAdmin, async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
+    const role = req.body.role;
+
+    const updatedUser = await updateUser(user_id, name, email, password, role);
+    const user = await User.findByIdAndUpdate(user_id);
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
+
+router.delete("/:id", isAdmin, async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    await User.findByIdAndDelete(user_id);
+    res.status(200).send("User has been deleted");
+  } catch (error) {
+    res.status(400).send({
+      message: error.message,
+    });
+  }
+});
 module.exports = router;

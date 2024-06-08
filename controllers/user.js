@@ -6,7 +6,6 @@ const User = require("../models/user");
 const { JWT_PRIVATE_KEY } = require("../config");
 
 const getUserByEmail = async (email) => {
-  console.log(email);
   // find one user with the provided email
   const user = await User.findOne({ email: email });
   return user;
@@ -45,7 +44,6 @@ const loginUser = async (email, password) => {
 
   // 4. generate JWT token
   const token = generateTokenForUser(user);
-  console.log(token);
 
   // 5. return back the user data
   return {
@@ -100,10 +98,45 @@ const getUser = async (id) => {
   return user;
 };
 
+// create new user
+const addUser = async (name, email, password, role) => {
+  const newUser = new User({
+    name,
+    email,
+    password,
+    role,
+  });
+  await newUser.save();
+  return newUser;
+};
+
+// update user
+const updateUser = async (user_id, name, email, password, role) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    user_id,
+    {
+      name,
+      email,
+      password,
+      role,
+    },
+    { new: true }
+  );
+  return updatedUser;
+};
+
+// delete user
+const deleteUser = async (id) => {
+  return await User.findByIdAndDelete(id);
+};
+
 module.exports = {
   getUserByEmail,
   loginUser,
   signUpUser,
   getUsers,
   getUser,
+  addUser,
+  updateUser,
+  deleteUser,
 };

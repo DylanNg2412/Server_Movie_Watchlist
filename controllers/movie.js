@@ -55,7 +55,8 @@ const addMovie = async (
   release_date,
   director,
   cast,
-  image
+  image,
+  description
 ) => {
   // create new movie
   const newMovie = new Movie({
@@ -66,6 +67,7 @@ const addMovie = async (
     director,
     cast,
     image,
+    description,
   });
   // save the movie with mongodb
   await newMovie.save();
@@ -82,7 +84,9 @@ const updateMovie = async (
   release_date,
   director,
   cast,
-  image
+  image,
+  description,
+  status
 ) => {
   const updatedMovie = await Movie.findByIdAndUpdate(
     movie_id,
@@ -94,6 +98,8 @@ const updateMovie = async (
       director,
       cast,
       image,
+      description,
+      status,
     },
     { new: true } // send in the updated data
   );

@@ -6,7 +6,7 @@ const getWatchlists = async (user) => {
   try {
     let filters = {};
     if (user && user.role === "user") {
-      filters.userEmail = user.email;
+      filters.user = user._id;
     }
     const watchlists = await Watchlist.find(filters)
       .sort({ _id: -1 })

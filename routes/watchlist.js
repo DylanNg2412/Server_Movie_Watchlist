@@ -15,8 +15,13 @@ const { isUserValid, isAdmin } = require("../middleware/auth");
 
 router.get("/", isUserValid, async (req, res) => {
   try {
-    const watchlists = await getWatchlists();
+    const watchlists = await getWatchlists(req.user);
     res.status(200).send(watchlists);
+    // let filter = {};
+    // if (req.user && req.user.role === "user") {
+    //   filter.user = req.user._id;
+    // }
+    // res.status(200).send(await Watchlist.find(filter).sort({ _id: -1 }));
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
@@ -60,7 +65,7 @@ router.put("/:id", isAdmin, async (req, res) => {
   }
 });
 
-router.delete("/:id", isAdmin, async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const watchlist = await getWatchlist(id);
