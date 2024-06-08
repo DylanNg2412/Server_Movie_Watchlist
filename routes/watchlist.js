@@ -4,7 +4,7 @@ const {
   getWatchlist,
   addNewWatchlist,
   updateWatchlist,
-  deleteWatchlist,
+  removeFromWatchlist,
 } = require("../controllers/watchlist");
 
 const router = express.Router();
@@ -65,16 +65,13 @@ router.put("/:id", isAdmin, async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isUserValid, async (req, res) => {
   try {
-    const id = req.params.id;
-    const watchlist = await getWatchlist(id);
-    if (watchlist) {
-      await deleteWatchlist(id);
-      res.status(200).send("Deleted");
-    } else {
-      res.status(400).send("Watchlist not found");
-    }
+    const user_id = req.user._id;
+    console.log(user_id);
+    const movieId = req.params.id;
+    const updatedWatchlist = await removeFromWatchlist(movieId, user_id);
+    res.status(200).send(updatedWatchlist);
   } catch (error) {
     res.status(400).send({ message: error.message });
   }

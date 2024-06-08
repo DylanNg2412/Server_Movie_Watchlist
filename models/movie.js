@@ -19,7 +19,7 @@ const movieSchema = new Schema({
   status: {
     type: String,
     default: "Want to watch",
-    enum: ["Want to watch", "Watching", "Watched"],
+    enum: ["Want to watch", "Watched"],
   },
 });
 

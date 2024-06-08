@@ -25,6 +25,7 @@ const getWatchlist = async (user_id) => {
 const addNewWatchlist = async (movie_id, user_id) => {
   // Use await to find the user's watchlist
   const userWatchlist = await Watchlist.findOne({ user: user_id });
+
   if (!userWatchlist) {
     // If the user does not have a watchlist, create a new one
     const newWatchlist = new Watchlist({
@@ -34,9 +35,11 @@ const addNewWatchlist = async (movie_id, user_id) => {
     await newWatchlist.save();
     return newWatchlist;
   } else {
-    // If the user already has a watchlist, add the movie to it
-    userWatchlist.movies.push(movie_id);
-    await userWatchlist.save(); // Save the updated watchlist
+    // If the user already has a watchlist, check if the movie is already in the list
+    if (!userWatchlist.movies.includes(movie_id)) {
+      userWatchlist.movies.push(movie_id); // Add the movie to the watchlist if it's not already there
+      await userWatchlist.save(); // Save the updated watchlist
+    }
     return userWatchlist;
   }
 };
@@ -61,12 +64,17 @@ const updateWatchlist = async (
   }
 };
 
-const deleteWatchlist = async (id) => {
-  try {
-    await Watchlist.findByIdAndDelete(id);
-    return true;
-  } catch (error) {
-    throw new Error(e);
+const removeFromWatchlist = async (movieId, user_id) => {
+  const userWatchlist = await Watchlist.findOne({ user: user_id });
+  if (!userWatchlist) {
+    throw new Error("Watchlist not found");
+  } else {
+    // Remove the movie from the watchlist
+    userWatchlist.movies = userWatchlist.movies.filter(
+      (id) => id.toString() !== movieId
+    );
+    await userWatchlist.save();
+    return userWatchlist;
   }
 };
 
@@ -75,5 +83,5 @@ module.exports = {
   getWatchlist,
   addNewWatchlist,
   updateWatchlist,
-  deleteWatchlist,
+  removeFromWatchlist,
 };
