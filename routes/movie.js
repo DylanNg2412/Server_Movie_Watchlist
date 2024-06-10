@@ -53,7 +53,6 @@ router.post("/", isAdmin, async (req, res) => {
     const cast = req.body.cast;
     const image = req.body.image;
     const description = req.body.description;
-    console.log(genres);
     // const genreArray = Array.isArray(genre) ? genre : [genre];
     const newMovie = await addMovie(
       title,
@@ -76,7 +75,6 @@ router.post("/", isAdmin, async (req, res) => {
 // update
 router.put("/:id", isAdmin, async (req, res) => {
   try {
-    console.log(req.body);
     const movie_id = req.params.id;
     const title = req.body.title;
     const country = req.body.country;

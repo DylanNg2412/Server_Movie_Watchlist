@@ -1,66 +1,94 @@
 const axios = require("axios");
 
 const Watchlist = require("../models/watchlist");
+const Movie = require("../models/movie");
 
 const getWatchlists = async (user) => {
   try {
-    let filters = {};
-    if (user && user.role === "user") {
-      filters.user = user._id;
-    }
-    const watchlists = await Watchlist.find(filters)
+    // let filters = {};
+    // if (user && user.role === "user") {
+    //   filters.user = user._id;
+    // }
+    const watchlists = await Watchlist.find({ user: user._id })
       .sort({ _id: -1 })
-      .populate("movies");
+      .populate("movie");
     return watchlists;
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 
-const getWatchlist = async (user_id) => {
-  const watchlist = await Watchlist.find({ user: user_id }).populate("movies");
-  return watchlist;
+const getWatchlist = async (movie_id, user_id) => {
+  try {
+    const watchlist = await Watchlist.findOne({
+      user: user_id,
+      movie: movie_id,
+    }).populate("movie");
+
+    return watchlist;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 const addNewWatchlist = async (movie_id, user_id) => {
-  // Use await to find the user's watchlist
-  const userWatchlist = await Watchlist.findOne({ user: user_id });
+  try {
+    // Find the user's watchlist
+    const movie = await Movie.findById(movie_id);
 
-  if (!userWatchlist) {
-    // If the user does not have a watchlist, create a new one
-    const newWatchlist = new Watchlist({
-      user: user_id,
-      movies: [movie_id], // Assuming movies is an array
-    });
-    await newWatchlist.save();
-    return newWatchlist;
-  } else {
-    // If the user already has a watchlist, check if the movie is already in the list
-    if (!userWatchlist.movies.includes(movie_id)) {
-      userWatchlist.movies.push(movie_id); // Add the movie to the watchlist if it's not already there
-      await userWatchlist.save(); // Save the updated watchlist
+    if (!movie) {
+      throw new Error("Movie not found");
     }
-    return userWatchlist;
+
+    const userWatchlist = await Watchlist.findOne({
+      user: user_id,
+      movie: movie_id,
+    });
+
+    if (userWatchlist) {
+      await Watchlist.deleteOne({ user: user_id, movie: movie_id });
+      return { message: "Movie removed from watchlist" };
+    } else {
+      const userWatchlist = new Watchlist({ user: user_id, movie: movie_id });
+      await userWatchlist.save();
+      return { message: "Movie added to watchlist" };
+    }
+  } catch (error) {
+    console.error("Error adding movie to watchlist:", error);
+    throw error;
   }
 };
 
-const updateWatchlist = async (
-  movie_id,
-  userName,
-  userEmail,
-  movies,
-  status
-) => {
+const updateWatchlist = async (userId, movieId, status) => {
   try {
-    const updatedWatchlist = await Watchlist.findByIdAndUpdate(movie_id, {
-      userName,
-      userEmail,
-      movies,
-      status,
+    const movie = await Movie.findById(movieId);
+
+    if (!movie) {
+      throw new Error("User or movie not found");
+    }
+
+    let watchlistItem = await Watchlist.findOne({
+      user: userId,
+      movie: movieId,
     });
-    return updatedWatchlist;
+
+    if (!watchlistItem) {
+      throw new Error("Need to add to watchlist first");
+    }
+
+    if (
+      status !== "Want to watch" &&
+      status !== "Watching" &&
+      status !== "Watched"
+    ) {
+      throw new Error("Status should be want to watch, watching or watched");
+    }
+
+    watchlistItem.status = status;
+    await watchlistItem.save();
+    return watchlistItem;
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 

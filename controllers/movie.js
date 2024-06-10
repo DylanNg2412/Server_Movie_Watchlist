@@ -5,23 +5,20 @@ const getMovies = async (search, genres, sort) => {
   try {
     const movies = await Movie.find().populate("genres");
     let filteredMovies = [...movies];
-    // console.log(movies);
 
     // Search by keyword in the title
     if (search) {
-      // console.log(search);
       const searchKeyword = search.toLowerCase();
       filteredMovies = filteredMovies.filter((movie) =>
         movie.title.toLowerCase().includes(searchKeyword)
       );
     }
     // Filter by genre
-    if (genres) {
+    if (genres && genres.length > 0) {
       filteredMovies = filteredMovies.filter((movie) =>
-        movie.genres.includes(genres)
+        movie.genres.some((genre) => genres.includes(genre.name))
       );
     }
-    // console.log(filteredMovies);
 
     // Sort by Country or Released date
     if (sort) {

@@ -1,17 +1,22 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const watchListSchema = new Schema({
+const watchListSchema = new mongoose.Schema({
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
-  movies: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Movie",
-    },
-  ],
+  movie: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Movie",
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["Want to watch", "Watching", "Watched"],
+    default: "Want to watch",
+  },
 });
 
 const Watchlist = model("Watchlist", watchListSchema);

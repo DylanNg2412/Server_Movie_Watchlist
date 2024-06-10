@@ -16,11 +16,6 @@ const movieSchema = new Schema({
   cast: { type: Array, required: true },
   image: { type: String },
   description: { type: String },
-  status: {
-    type: String,
-    default: "Want to watch",
-    enum: ["Want to watch", "Watched"],
-  },
 });
 
 // convert the schema to a model

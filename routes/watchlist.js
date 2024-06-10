@@ -27,11 +27,13 @@ router.get("/", isUserValid, async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", isUserValid, async (req, res) => {
   try {
-    const user_id = req.params.id;
-    const watchlist = await getWatchlist(user_id);
+    const user_id = req.user._id;
+    const movie_id = req.params.id;
+    const watchlist = await getWatchlist(movie_id, user_id);
     // console.log(watchlist);
+
     res.status(200).send(watchlist);
   } catch (error) {
     res.status(400).send({ message: error.message });
@@ -41,7 +43,8 @@ router.get("/:id", async (req, res) => {
 router.post("/", isUserValid, async (req, res) => {
   try {
     const user_id = req.user._id;
-    const movie_id = req.body.movie;
+    const movie_id = req.body.movie_id;
+
     const addWatchlist = await addNewWatchlist(movie_id, user_id);
     res.status(200).send(addWatchlist);
   } catch (error) {
@@ -49,16 +52,12 @@ router.post("/", isUserValid, async (req, res) => {
   }
 });
 
-router.put("/:id", isAdmin, async (req, res) => {
+router.put("/:id", isUserValid, async (req, res) => {
   try {
-    const { userName, userEmail, movies, status } = req.body;
-    const updatedWatchlist = await updateWatchlist(
-      req.params.id,
-      userName,
-      userEmail,
-      movies,
-      status
-    );
+    const { status } = req.body;
+    const movieId = req.params.id;
+    const userId = req.user._id;
+    const updatedWatchlist = await updateWatchlist(userId, movieId, status);
     res.status(200).send(updatedWatchlist);
   } catch (error) {
     res.status(400).send({ message: error.message });
@@ -68,7 +67,6 @@ router.put("/:id", isAdmin, async (req, res) => {
 router.delete("/:id", isUserValid, async (req, res) => {
   try {
     const user_id = req.user._id;
-    console.log(user_id);
     const movieId = req.params.id;
     const updatedWatchlist = await removeFromWatchlist(movieId, user_id);
     res.status(200).send(updatedWatchlist);
