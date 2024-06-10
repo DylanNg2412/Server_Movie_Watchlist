@@ -30,7 +30,7 @@ mongoose
   .then(() => {
     console.log("MongoDB connected");
   })
-  .catch(() => {
+  .catch((error) => {
     console.log(error);
   });
 
